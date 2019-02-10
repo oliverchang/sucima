@@ -1,9 +1,9 @@
 #include "sucima.h"
 
 void setup() {
-  do_setup();
-}
+  DoSetup();
+} 
 
 void loop() {
-  do_loop();
+  DoLoop();
 }

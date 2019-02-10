@@ -1,0 +1,16 @@
+{
+  "short_name": "Sucima",
+  "name": "Sucima",
+  "start_url": "/",
+  "icons": [
+      {
+        "src": "img/icons/icon-144x144.png",
+        "sizes": "144x144",
+        "type": "image/png"
+      }
+  ],
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#ffffff"
+}
