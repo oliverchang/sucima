@@ -36,6 +36,7 @@ constexpr int kStepperUD3 = 38;
 constexpr int kForwardDir = LOW;
 constexpr int kBackwardDir = HIGH;
 constexpr int kMotorFeedDir = kForwardDir;
+constexpr int kMotorFeedJamDir = kBackwardDir;
 
 #define BluetoothSerial Serial1
 #define DebugLog Serial.print
@@ -74,6 +75,7 @@ constexpr int kStepperUD3 = 10;
 constexpr int kForwardDir = LOW;
 constexpr int kBackwardDir = HIGH;
 constexpr int kMotorFeedDir = kBackwardDir;
+constexpr int kMotorFeedJamDir = kForwardDir;
 
 #define BluetoothSerial Serial
 #define DebugLog
