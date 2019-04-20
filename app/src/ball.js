@@ -17,7 +17,7 @@ class Ball {
   }
 
   encode(result) {
-    result[0] = this.spin_angle / 2;
+    result[0] = ((this.spin_angle + 360) % 360) / 2;
     result[1] = this.spin_strength;
     result[2] = this.trajectory;
     result[3] = this.position;

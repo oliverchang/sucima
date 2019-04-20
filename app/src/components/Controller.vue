@@ -47,19 +47,19 @@
   </div>
   <div class="form-row">
     <div class="form-group col-12 col-md-4">
-      <label for="spin_angle">
-        Spin angle
-        <input class="val form-control" type="number" v-model="balls[cur-1].spin_angle">
-      </label>
-      <input class="form-control custom-range" v-model="balls[cur-1].spin_angle" id="spin" type="range" min="0" max="360" step="2">
-    </div>
-
-    <div class="form-group col-12 col-md-4">
       <label for="spin_strength">
         Spin strength
         <input class="val form-control" type="number" v-model="balls[cur-1].spin_strength">
       </label>
       <input class="form-control custom-range" v-model="balls[cur-1].spin_strength" id="spin_strength" type="range" min="0" max="20">
+    </div>
+
+    <div class="form-group col-12 col-md-4">
+      <label for="spin_angle">
+        Spin angle
+        <input v-bind:disabled="spinDisabled" class="val form-control" type="number" v-model="balls[cur-1].spin_angle">
+      </label>
+      <input v-bind:disabled="spinDisabled" class="form-control custom-range" v-model="balls[cur-1].spin_angle" id="spin" type="range" min="-180" max="180" step="2">
     </div>
 
     <div class="form-group col-12 col-md-4">
@@ -240,6 +240,9 @@ export default {
     },
     startDisabled() {
       return !this.connected || this.bpm === 0;
+    },
+    spinDisabled() {
+      return this.balls[this.cur-1].spin_strength == 0;
     },
   },
 }
