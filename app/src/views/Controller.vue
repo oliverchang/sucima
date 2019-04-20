@@ -63,10 +63,15 @@ export default {
       };
 
       let device = await navigator.bluetooth.requestDevice(options);
+      device.addEventListener('gattserverdisconnected', onDisconnected);
       await device.gatt.connect();
       let service = await device.gatt.getPrimaryService(0xffe0);
       this.writeCharacteristic = await service.getCharacteristic(0xffe1);
       this.connected = true;
+    },
+
+    onDisconnected() {
+      this.connected = false;
     },
 
     async writeBuffer(buffer) {
