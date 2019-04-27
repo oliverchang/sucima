@@ -4,18 +4,20 @@
 class BallFeedController {
  public:
   void FeedOne();
+  void Stop();
   void Loop();
   bool BallWasFed();
+  bool IsJammed();
 
  private:
   enum State {
-    kIdle,
-    kFeeding,
-    kJammed,
+    IDLE,
+    FEEDING,
   };
   unsigned long last_millis_ = 0;
   bool ball_was_fed_ = false;
-  State state_ = kIdle;
+  bool jammed_ = false;
+  State state_ = IDLE;
 };
 
 extern BallFeedController g_ball_feed_controller;

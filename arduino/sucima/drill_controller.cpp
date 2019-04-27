@@ -11,7 +11,7 @@ DrillController g_drill_controller;
 
 namespace {
 
-constexpr int kSampleWheelSpinTime = 1000;
+constexpr int kSampleWheelSpinTime = 2000;
 
 void PrintBall(const Ball& ball) {
   DebugLog("spin_angle=");
@@ -63,8 +63,7 @@ void DrillController::SetBallsPerMinute(int balls_per_min) {
     cur_ = 0;
     PrepareBall(drill_[cur_]);
   } else {
-    state_ = NONE;
-    g_wheel_controller.SetConfiguration(0, 0, 0);
+    state_ = DRILL_STOPPING;
   }
 }
 
@@ -87,6 +86,9 @@ void DrillController::Loop() {
     if (g_ball_feed_controller.BallWasFed()) {
       state_ = SAMPLE_FED;
       next_ball_time_ = millis() + kSampleWheelSpinTime;
+    } else if (g_ball_feed_controller.IsJammed()) {
+      HandleJam();
+      return;
     }
     break;
   case SAMPLE_FED:
@@ -102,6 +104,9 @@ void DrillController::Loop() {
     if (g_ball_feed_controller.BallWasFed()) {
       // Prepare the next ball.
       PrepareBall(drill_[cur_]);
+    } else if (g_ball_feed_controller.IsJammed()) {
+      state_ = DRILL_STOPPING;
+      return;
     }
 
     if (millis() < next_ball_time_)
@@ -115,6 +120,12 @@ void DrillController::Loop() {
       cur_ = 0;
 
     break;
+  case DRILL_STOPPING:
+    // Prevent jams by making sure the last ball is played.
+    if (millis() >= next_ball_time_) {
+      state_ = NONE;
+      g_wheel_controller.SetConfiguration(0, 0, 0);
+    }
   case NONE:
   default:
     break;
@@ -122,8 +133,43 @@ void DrillController::Loop() {
 }
 
 void DrillController::PrepareBall(const Ball& ball) {
+  being_played_ = ball;
   g_head_controller.SetOrientation(ball.position(), ball.trajectory());
   g_wheel_controller.SetConfiguration(
       ball.spin_angle(), ball.spin_strength(), ball.speed());
+}
+
+void DrillController::HandleJam() {
+  state_ = NONE;
+  g_wheel_controller.SetConfiguration(0, 0, 0);
+  g_ball_feed_controller.Stop();
+  // TOOD: better handling of jams
+  /*
+  static constexpr int kForwardReverseTimes = 6;
+  static constexpr int kDelay = 400;
+
+  int cur_dir = kForwardDir;
+  int cur_feed_dir = kMotorFeedDir;
+
+  for (int i = 0; i < kForwardReverseTimes; ++i) {
+    analogWrite(kPinMotorFeedDir, cur_feed_dir);
+    analogWrite(kPinMotorBottomDir, cur_dir);
+    analogWrite(kPinMotorLeftDir, cur_dir);
+    analogWrite(kPinMotorRightDir, cur_dir);
+    analogWrite(kPinMotorBottomPwm, 200);
+    analogWrite(kPinMotorLeftPwm, 200);
+    analogWrite(kPinMotorRightPwm, 200);
+    analogWrite(kPinMotorFeedPwm, 200);
+
+    delay(kDelay);
+
+    cur_dir = cur_dir == HIGH ? LOW : HIGH;
+    cur_feed_dir = cur_feed_dir == HIGH ? LOW : HIGH;
+  }
+
+  // Prepare ball again.
+  PrepareBall(being_played_);
+  g_ball_feed_controller.FeedOne();
+  */
 }
 

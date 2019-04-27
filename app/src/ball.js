@@ -5,7 +5,7 @@ function encodeSpinAngle(angle) {
 function decodeSpinAngle(value) {
   let result = value * 2;
   if (result <= 180) {
-    return 180;
+    return result;
   }
 
   return result - 360;
@@ -21,8 +21,13 @@ class Ball {
   }
 
   static decode(buffer) {
-    let array = new Uint8Array(buffer);
-    return new Ball(decodeSpinAngle(array[0]), array[1], array[2], array[3], array[4]);
+    let view = new DataView(buffer);
+    return new Ball(
+        decodeSpinAngle(view.getUint8(0)),
+        view.getUint8(1),
+        view.getUint8(2),
+        view.getInt8(3),
+        view.getUint8(4));
   }
 
   static get encodedSize() {
@@ -31,7 +36,6 @@ class Ball {
 
   encode(result) {
     result[0] = encodeSpinAngle(this.spin_angle);
-    console.log(result[0]);
     result[1] = this.spin_strength;
     result[2] = this.trajectory;
     result[3] = this.position;

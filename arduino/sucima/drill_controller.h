@@ -21,9 +21,11 @@ class DrillController {
     SAMPLE,
     SAMPLE_FED,
     DRILL,
+    DRILL_STOPPING,
   };
 
   void PrepareBall(const Ball& ball);
+  void HandleJam();
 
   Ball drill_[kMaxDrillLength];
   size_t drill_length_ = 0;
@@ -31,6 +33,7 @@ class DrillController {
   unsigned long next_ball_time_ = 0;
   int balls_per_min_ = 0;
   State state_ = NONE;
+  Ball being_played_;
 };
 
 extern DrillController g_drill_controller;

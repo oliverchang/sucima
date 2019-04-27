@@ -121,7 +121,7 @@ export default {
       for (let i = 0; i < this.nballs; i++) {
         let index = 2  + i * Ball.encodedSize;
         this.$set(this.balls, i,
-                  Ball.decode(data.slice(index, index + Ball.encodedSize)));
+                  Ball.decode(data.slice(index, index + Ball.encodedSize).buffer));
       }
 
       this.name = this.$route.query.name;
