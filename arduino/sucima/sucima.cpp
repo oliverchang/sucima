@@ -133,6 +133,7 @@ void DoSetup() {
 
   //FirstTimeSetupBluetooth();
   g_head_controller.Calibrate();
+
 }
 
 void DoLoop() {

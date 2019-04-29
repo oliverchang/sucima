@@ -6,7 +6,7 @@
 namespace {
 
 constexpr int kMotorPwm = 180;
-constexpr int kSensorThreshold = 300;
+constexpr int kSensorThreshold = 150;
 constexpr int kMinimumMillis = 200;
 constexpr int kFeedDeadline = 1000;
 constexpr int kReverseTime = 500;
@@ -18,6 +18,7 @@ BallFeedController g_ball_feed_controller;
 void BallFeedController::FeedOne() {
   state_ = FEEDING;
   last_millis_ = millis();
+  digitalWrite(kPinMotorFeedDir, kMotorFeedDir);
   analogWrite(kPinMotorFeedPwm, kMotorPwm);
 }
 
@@ -44,6 +45,11 @@ void BallFeedController::Loop() {
   default:
     break;
   }
+}
+
+void BallFeedController::ReverseJam() {
+  digitalWrite(kPinMotorFeedDir, kMotorFeedJamDir);
+  analogWrite(kPinMotorFeedPwm, kMotorPwm);
 }
 
 bool BallFeedController::BallWasFed() {

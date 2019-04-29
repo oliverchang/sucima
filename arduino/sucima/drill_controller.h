@@ -15,6 +15,7 @@ class DrillController {
 
  private:
   static constexpr int kMaxDrillLength = 10;
+  static constexpr int kMaxJamCount = 4;
 
   enum State {
     NONE,
@@ -22,18 +23,22 @@ class DrillController {
     SAMPLE_FED,
     DRILL,
     DRILL_STOPPING,
+    JAMMED,
   };
 
   void PrepareBall(const Ball& ball);
+  unsigned long NextBallTime();
   void HandleJam();
 
+  Ball being_played_;
   Ball drill_[kMaxDrillLength];
   size_t drill_length_ = 0;
   size_t cur_ = 0;
   unsigned long next_ball_time_ = 0;
   int balls_per_min_ = 0;
   State state_ = NONE;
-  Ball being_played_;
+  State pre_jam_state_ = NONE;
+  int jam_count_ = 0;
 };
 
 extern DrillController g_drill_controller;

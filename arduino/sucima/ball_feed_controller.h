@@ -6,6 +6,7 @@ class BallFeedController {
   void FeedOne();
   void Stop();
   void Loop();
+  void ReverseJam();
   bool BallWasFed();
   bool IsJammed();
 

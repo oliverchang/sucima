@@ -11,7 +11,9 @@ DrillController g_drill_controller;
 
 namespace {
 
-constexpr int kSampleWheelSpinTime = 2000;
+constexpr int kSampleWheelSpinTime = 1500;
+constexpr int kMaxJamCount = 4;
+constexpr int kJamReverseTime = 500;
 
 void PrintBall(const Ball& ball) {
   DebugLog("spin_angle=");
@@ -25,10 +27,6 @@ void PrintBall(const Ball& ball) {
   DebugLog(" speed=");
   DebugLog(ball.speed());
   DebugLog("\n");
-}
-
-unsigned long NextBallTime(int balls_per_min) {
-  return millis() + 60000 / balls_per_min;
 }
 
 }
@@ -56,11 +54,11 @@ void DrillController::SetBallsPerMinute(int balls_per_min) {
   DebugLog(balls_per_min);
   DebugLog("\n");
   balls_per_min_ = balls_per_min;
-  next_ball_time_ = NextBallTime(balls_per_min_);
 
   if (balls_per_min_) {
     state_ = DRILL;
     cur_ = 0;
+    next_ball_time_ = NextBallTime();
     PrepareBall(drill_[cur_]);
   } else {
     state_ = DRILL_STOPPING;
@@ -84,8 +82,9 @@ void DrillController::Loop() {
   switch (state_) {
   case SAMPLE:
     if (g_ball_feed_controller.BallWasFed()) {
+      jam_count_ = 0;
       state_ = SAMPLE_FED;
-      next_ball_time_ = millis() + kSampleWheelSpinTime;
+      next_ball_time_ = NextBallTime();
     } else if (g_ball_feed_controller.IsJammed()) {
       HandleJam();
       return;
@@ -103,9 +102,10 @@ void DrillController::Loop() {
 
     if (g_ball_feed_controller.BallWasFed()) {
       // Prepare the next ball.
+      jam_count_ = 0;
       PrepareBall(drill_[cur_]);
     } else if (g_ball_feed_controller.IsJammed()) {
-      state_ = DRILL_STOPPING;
+      HandleJam();
       return;
     }
 
@@ -113,7 +113,7 @@ void DrillController::Loop() {
       return;
 
     g_ball_feed_controller.FeedOne();
-    next_ball_time_ = NextBallTime(balls_per_min_);
+    next_ball_time_ = NextBallTime();
 
     ++cur_;
     if (cur_ >= drill_length_)
@@ -126,6 +126,17 @@ void DrillController::Loop() {
       state_ = NONE;
       g_wheel_controller.SetConfiguration(0, 0, 0);
     }
+    break;
+  case JAMMED:
+    if (millis() < next_ball_time_)
+      return;
+
+    // Hopefully the jam was resolved. Try playing the ball again.
+    state_ = pre_jam_state_;
+    PrepareBall(being_played_);
+    g_ball_feed_controller.FeedOne();
+    next_ball_time_ = NextBallTime();
+    break;
   case NONE:
   default:
     break;
@@ -139,37 +150,35 @@ void DrillController::PrepareBall(const Ball& ball) {
       ball.spin_angle(), ball.spin_strength(), ball.speed());
 }
 
-void DrillController::HandleJam() {
-  state_ = NONE;
-  g_wheel_controller.SetConfiguration(0, 0, 0);
-  g_ball_feed_controller.Stop();
-  // TOOD: better handling of jams
-  /*
-  static constexpr int kForwardReverseTimes = 6;
-  static constexpr int kDelay = 400;
-
-  int cur_dir = kForwardDir;
-  int cur_feed_dir = kMotorFeedDir;
-
-  for (int i = 0; i < kForwardReverseTimes; ++i) {
-    analogWrite(kPinMotorFeedDir, cur_feed_dir);
-    analogWrite(kPinMotorBottomDir, cur_dir);
-    analogWrite(kPinMotorLeftDir, cur_dir);
-    analogWrite(kPinMotorRightDir, cur_dir);
-    analogWrite(kPinMotorBottomPwm, 200);
-    analogWrite(kPinMotorLeftPwm, 200);
-    analogWrite(kPinMotorRightPwm, 200);
-    analogWrite(kPinMotorFeedPwm, 200);
-
-    delay(kDelay);
-
-    cur_dir = cur_dir == HIGH ? LOW : HIGH;
-    cur_feed_dir = cur_feed_dir == HIGH ? LOW : HIGH;
+unsigned long DrillController::NextBallTime() {
+  switch (state_) {
+  case DRILL:
+    return millis() + 60000 / balls_per_min_;
+  case SAMPLE_FED:
+    return millis() + kSampleWheelSpinTime;
+  default:
+    // Unreached.
+    abort();
+    break;
   }
-
-  // Prepare ball again.
-  PrepareBall(being_played_);
-  g_ball_feed_controller.FeedOne();
-  */
 }
 
+void DrillController::HandleJam() {
+  ++jam_count_;
+  if (jam_count_ >= kMaxJamCount) {
+    // Jammed too many times, bail out.
+    state_ = NONE;
+    g_wheel_controller.Stop();
+    g_ball_feed_controller.Stop();
+    return;
+  }
+
+  pre_jam_state_ = state_;
+  state_ = JAMMED;
+
+  // Reverse motor wheels and ball feed to try to unjam.
+  g_wheel_controller.ReverseJam();
+  g_ball_feed_controller.ReverseJam();
+
+  next_ball_time_ = millis() + kJamReverseTime;
+}
