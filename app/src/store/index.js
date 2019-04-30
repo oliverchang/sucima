@@ -23,16 +23,12 @@ function clamp(val, min, max) {
 
 export default new Vuex.Store({
   state: {
-    connected: false,
     name: '',
     balls: initBalls(),
     nballs: 1,
     bpm: 0,
   },
   mutations: {
-    UPDATE_CONNECTED(state, connected) {
-      this.connected = connected;
-    },
     UPDATE_NAME(state, name) {
       state.name = name;
     },

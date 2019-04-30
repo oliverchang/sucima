@@ -34,7 +34,6 @@ export default {
     return {
       deferredInstallPrompt: null,
       showInstall: false,
-      connected: false,
       writeCharacteristic: null,
     };
   },
@@ -133,6 +132,7 @@ export default {
   },
   computed: {
     ...mapState([
+      'connected',
       'nballs',
     ])
   },
