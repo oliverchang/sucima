@@ -49,25 +49,25 @@
     <div class="form-group col-12 col-md-4">
       <label for="spin_strength">
         Spin strength
-        <input class="val form-control" type="number" v-model="balls[cur-1].spin_strength">
+        <input class="val form-control" type="number" v-model="spin_strength">
       </label>
-      <input class="form-control custom-range" v-model="balls[cur-1].spin_strength" id="spin_strength" type="range" min="0" max="20">
+      <input class="form-control custom-range" v-model="spin_strength" id="spin_strength" type="range" min="0" max="20">
     </div>
 
     <div class="form-group col-12 col-md-4">
       <label for="spin_angle">
         Spin angle
-        <input v-bind:disabled="spinDisabled" class="val form-control" type="number" v-model="balls[cur-1].spin_angle">
+        <input v-bind:disabled="spinDisabled" class="val form-control" type="number" v-model="spin_angle">
       </label>
-      <input v-bind:disabled="spinDisabled" class="form-control custom-range" v-model="balls[cur-1].spin_angle" id="spin" type="range" min="-180" max="180" step="2">
+      <input v-bind:disabled="spinDisabled" class="form-control custom-range" v-model="spin_angle" id="spin" type="range" min="-180" max="180" step="2">
     </div>
 
     <div class="form-group col-12 col-md-4">
       <label for="speed">
         Speed
-        <input class="val form-control" type="number" v-model="balls[cur-1].speed">
+        <input class="val form-control" type="number" v-model="speed">
       </label>
-      <input class="form-control custom-range" v-model="balls[cur-1].speed" id="speed" type="range" min="1" max="20">
+      <input class="form-control custom-range" v-model="speed" id="speed" type="range" min="1" max="20">
     </div>
   </div>
 
@@ -75,17 +75,17 @@
     <div class="form-group col-12 col-md-4">
       <label for="position">
         Position
-        <input class="val form-control" type="number" v-model="balls[cur-1].position">
+        <input class="val form-control" type="number" v-model="position">
       </label>
-      <input class="form-control custom-range" v-model="balls[cur-1].position" id="position" type="range" min="-8" max="8">
+      <input class="form-control custom-range" v-model="position" id="position" type="range" min="-8" max="8">
     </div>
 
     <div class="form-group col-12 col-md-4">
       <label for="trajectory">
         Trajectory
-        <input class="val form-control" type="number" v-model="balls[cur-1].trajectory">
+        <input class="val form-control" type="number" v-model="trajectory">
       </label>
-      <input class="form-control custom-range" v-model="balls[cur-1].trajectory" id="trajectory" type="range" min="0" max="16">
+      <input class="form-control custom-range" v-model="trajectory" id="trajectory" type="range" min="0" max="16">
     </div>
   </div>
   <div class="form-row">
@@ -111,15 +111,10 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Ball from '../ball.js'
 
 const kMaxBalls = 8;
-
-function clamp(val, min, max) {
-  if (val < min) val = min;
-  if (val > max) val = max;
-  return val;
-}
 
 function encodeString(str, result) {
   for (let i = 0; i < str.length; i++) {
@@ -127,51 +122,55 @@ function encodeString(str, result) {
   }
 }
 
-function initBalls(initialBalls) {
-  let balls = new Array(kMaxBalls);
-  for (let i = 0; i < kMaxBalls; i++) {
-    if (initialBalls && i < initialBalls.length) {
-      balls[i] = initialBalls[i];
-    } else {
-      balls[i] = new Ball(0, 0, 0, 0, 1);
-    }
+function computedBallProperties() {
+  const properties = [
+    'spin_strength',
+    'spin_angle',
+    'speed',
+    'position',
+    'trajectory',
+  ];
+
+  let result = {};
+  for (let prop of properties) {
+    result[prop] = {
+      get() {
+        return this.$store.state.balls[this.cur-1][prop];
+      },
+      set(value) {
+        this.$store.commit('UPDATE_BALL', {
+          i: this.cur-1,
+          prop: prop,
+          value: value,  
+        });
+      },
+    };
   }
 
-  return balls;
+  return result;
 }
 
 export default {
   name: 'Controller',
   data() {
     return {
-      bpm: this.initialBpm || 0,
       cur: 1,
-      balls: initBalls(this.initialBalls),
-      nballs: this.initialNumBalls || 1,
-      name: this.initialName || '',
     };
   },
   props: {
-    initialBalls: Array,
-    initialName: String,
-    initialNumBalls: Number,
-    initialBpm: Number,
     bleWrite: Function,
-    connected: Boolean,
     saveDrill: Function,
   },
   mounted() {
-    //if (this.initialBalls.length)
-    //  this.balls = this.initialBalls;
   },
   methods: {
     changeBallCount(delta) {
-      this.nballs = clamp(this.nballs + delta, 1, kMaxBalls);
+      this.$store.commit('CHANGE_BALL_COUNT', delta);
       if (this.cur > this.nballs)
         this.cur = this.nballs;
     },
     navigateBall(delta) {
-      this.cur = clamp(this.cur + delta, 1, this.nballs);
+      this.cur = Math.min(Math.max(this.cur + delta, 1), this.nballs);
     },
     async sample() {
       if (!this.connected) return;
@@ -220,20 +219,6 @@ export default {
       this.$router.push('/drills');
     }
   },
-  watch: {
-    initialBalls() {
-      this.balls = initBalls(this.initialBalls);
-    },
-    initialName() {
-      this.name = this.initialName;
-    },
-    initialNumBalls() {
-      this.nballs = this.initialNumBalls;
-    },
-    initialBpm() {
-      this.bpm = this.initialBpm;
-    }
-  },
   computed: {
     saveDisabled() {
       return this.name.length == 0;
@@ -244,6 +229,28 @@ export default {
     spinDisabled() {
       return this.balls[this.cur-1].spin_strength == 0;
     },
+    bpm: {
+      get() {
+        return this.$store.state.bpm;
+      },
+      set(value) {
+        this.$store.commit('UPDATE_BPM', value);
+      },
+    },
+    name: {
+      get() {
+        return this.$store.state.name;
+      },
+      set(value) {
+        this.$store.commit('UPDATE_NAME', value);
+      },
+    },
+    ...computedBallProperties(),
+    ...mapState([
+      'connected',
+      'balls',
+      'nballs',
+    ])
   },
 }
 </script>

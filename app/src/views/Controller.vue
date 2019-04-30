@@ -17,16 +17,14 @@
     <Controller
         v-bind:connected="connected"
         v-bind:ble-write="writeBuffer"
-        v-bind:initial-bpm="bpm"
-        v-bind:initial-balls="balls"
-        v-bind:initial-num-balls="nballs"
-        v-bind:initial-name="name"
         v-bind:save-drill="saveDrill">
     </Controller>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 import Ball from '../ball.js'
 import Controller from '../components/Controller.vue'
 
@@ -38,10 +36,6 @@ export default {
       showInstall: false,
       connected: false,
       writeCharacteristic: null,
-      balls: [],
-      nballs: 1,
-      bpm: 0,
-      name: '',
     };
   },
   mounted() {
@@ -67,11 +61,11 @@ export default {
       await device.gatt.connect();
       let service = await device.gatt.getPrimaryService(0xffe0);
       this.writeCharacteristic = await service.getCharacteristic(0xffe1);
-      this.connected = true;
+      this.$state.commit('SET_CONNECTED', true);
     },
 
     onDisconnected() {
-      this.connected = false;
+      this.$state.commit('SET_CONNECTED', false);
     },
 
     async writeBuffer(buffer) {
@@ -116,15 +110,17 @@ export default {
         return;
       }
 
-      this.bpm = data[0];
-      this.nballs = data[1];
+      this.$store.commit('UPDATE_BPM', data[0]);
+      this.$store.commit('UPDATE_BALL_COUNT', data[1]);
       for (let i = 0; i < this.nballs; i++) {
         let index = 2  + i * Ball.encodedSize;
-        this.$set(this.balls, i,
-                  Ball.decode(data.slice(index, index + Ball.encodedSize).buffer));
+        this.$store.commit('SET_BALL', {
+          i: i,
+          ball: Ball.decode(data.slice(index, index + Ball.encodedSize).buffer),
+        });
       }
 
-      this.name = this.$route.query.name;
+      this.$store.commit('UPDATE_NAME', this.$route.query.name);
     },
   },
   components: {
@@ -134,6 +130,11 @@ export default {
     '$route' (to, from) {
       this.parseParams();
     },
+  },
+  computed: {
+    ...mapState([
+      'nballs',
+    ])
   },
 }
 </script>
