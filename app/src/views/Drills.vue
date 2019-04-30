@@ -4,7 +4,7 @@
       <div class="col-md-12">
         <h1>Drills</h1>
         <b-list-group>
-          <b-list-group-item v-for="(value, key) in drills">
+          <b-list-group-item v-for="(value, key) in drills" v-bind:key="key">
             {{ key }}
             <b-button-group class="float-right">
               <b-button v-on:click="load(key)" variant="primary">Load</b-button>

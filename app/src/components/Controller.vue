@@ -114,8 +114,6 @@
 import { mapState } from 'vuex'
 import Ball from '../ball.js'
 
-const kMaxBalls = 8;
-
 function encodeString(str, result) {
   for (let i = 0; i < str.length; i++) {
     result[i] = str.charCodeAt(i);

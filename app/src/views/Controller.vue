@@ -126,7 +126,7 @@ export default {
     Controller
   },
   watch: {
-    '$route' (to, from) {
+    '$route' () {
       this.parseParams();
     },
   },
