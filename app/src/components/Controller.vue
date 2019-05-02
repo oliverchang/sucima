@@ -1,13 +1,24 @@
 <template>
 <div>
+  <b-modal
+    id="modalSave"
+    ref="modal"
+    title="Save drill"
+    v-bind:ok-disabled="saveDisabled"
+    @ok="save">
+    <form @submit.stop.prevent="handleSubmit">
+      <b-form-input type="text" placeholder="Drill name" v-model="name" />
+    </form>
+  </b-modal>
+
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <div class="form-row">
     <div class="form-group col-3 col-md-1">
       <div class="btn-group" role="group">
-        <button type="button" class="btn btn-danger control" v-on:click="changeBallCount(-1)">
+        <button type="button" class="btn btn-danger" v-on:click="changeBallCount(-1)">
           <i class="material-icons">remove</i>
         </button>
-        <button type="button" class="btn btn-primary control" v-on:click="changeBallCount(1)">
+        <button type="button" class="btn btn-primary" v-on:click="changeBallCount(1)">
           <i class="material-icons">add</i>
         </button>
       </div>
@@ -26,18 +37,7 @@
         <b-button v-b-modal.modalSave class="btn btn-success">
           <i class="material-icons">save</i>
         </b-button>
-        <b-modal
-          id="modalSave"
-          ref="modal"
-          title="Save drill"
-          v-bind:ok-disabled="saveDisabled"
-          @ok="save">
-          <form @submit.stop.prevent="handleSubmit">
-            <b-form-input type="text" placeholder="Drill name" v-model="name" />
-          </form>
-        </b-modal>
       </div>
-
       <b-button v-on:click="reset" class="btn btn-secondary float-right">
         <i class="material-icons">refresh</i>
       </b-button>
@@ -317,5 +317,8 @@ export default {
   }
   .spin-desc {
     padding-left: 1em;
+  }
+  .material-icons {
+    font-size: 18px;
   }
 </style>
