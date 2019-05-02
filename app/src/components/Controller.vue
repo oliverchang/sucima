@@ -4,26 +4,26 @@
   <div class="form-row">
     <div class="form-group col-3 col-md-1">
       <div class="btn-group" role="group">
-        <button type="button" class="btn btn-danger" v-on:click="changeBallCount(-1)">
+        <button type="button" class="btn btn-danger control" v-on:click="changeBallCount(-1)">
           <i class="material-icons">remove</i>
         </button>
-        <button type="button" class="btn btn-primary" v-on:click="changeBallCount(1)">
+        <button type="button" class="btn btn-primary control" v-on:click="changeBallCount(1)">
           <i class="material-icons">add</i>
         </button>
       </div>
     </div>
     <div class="form-group col-9 col-md-3">
       <div class="btn-group" role="group">
-        <button v-on:click="navigateBall(-1)" type="button" class="btn btn-info">
+        <b-button v-on:click="navigateBall(-1)" class="btn btn-info">
           <i class="material-icons">navigate_before</i>
-        </button>
-        <button v-on:click="navigateBall(1)" type="button" class="btn btn-info">
+        </b-button>
+        <b-button v-on:click="navigateBall(1)" class="btn btn-info">
           <i class="material-icons">navigate_next</i>
-        </button>
-        <button v-on:click="gotoDrills" type="button" class="btn btn-warning">
+        </b-button>
+        <b-button v-on:click="gotoDrills" class="btn btn-warning">
           <i class="material-icons">sort</i>
-        </button>
-        <b-button v-b-modal.modalSave type="button" class="btn btn-success">
+        </b-button>
+        <b-button v-b-modal.modalSave class="btn btn-success">
           <i class="material-icons">save</i>
         </b-button>
         <b-modal
@@ -37,6 +37,10 @@
           </form>
         </b-modal>
       </div>
+
+      <b-button v-on:click="reset" class="btn btn-secondary float-right">
+        <i class="material-icons">refresh</i>
+      </b-button>
     </div>
     <div class="form-group col-12 col-md-4">
       Ball
@@ -58,6 +62,7 @@
       <label for="spin_angle">
         Spin angle
         <input v-bind:disabled="spinDisabled" class="val form-control" type="number" v-model="spin_angle">
+        <small class="spin-desc">{{spinDesc}}</small>
       </label>
       <input v-bind:disabled="spinDisabled" class="form-control custom-range" v-model="spin_angle" id="spin" type="range" min="-180" max="180" step="2">
     </div>
@@ -215,6 +220,13 @@ export default {
 
     gotoDrills() {
       this.$router.push('/drills');
+    },
+
+    reset() {
+      this.$store.commit('UPDATE_NAME', '');
+      this.$store.commit('UPDATE_BPM', 0);
+      this.$store.commit('UPDATE_BALL_COUNT', 1);
+      this.$store.commit('RESET_BALLS');
     }
   },
   computed: {
@@ -226,6 +238,29 @@ export default {
     },
     spinDisabled() {
       return this.balls[this.cur-1].spin_strength == 0;
+    },
+    spinDesc() {
+      if (this.spinDisabled) return '';
+
+      if (this.spin_angle == 0) {
+        return 'Top';
+      } else if (this.spin_angle == -180 || this.spin_angle == 180) {
+        return 'Back';
+      } else if (this.spin_angle == 90) {
+        return 'Right';
+      } else if (this.spin_angle == -90) {
+        return 'Left';
+      } else if (this.spin_angle > -180 && this.spin_angle < -90) {
+        return 'Bottom left';
+      } else if (this.spin_angle > -90 && this.spin_angle < 0) {
+        return 'Top left';
+      } else if (this.spin_angle > 0 && this.spin_angle < 90) {
+        return 'Top right';
+      } else if (this.spin_angle > 90 && this.spin_angle < 180) {
+        return 'Bottom left';
+      }
+
+      return '';
     },
     bpm: {
       get() {
@@ -259,7 +294,7 @@ export default {
     display: inline;
   }
   .val {
-    max-width: 3.5em;
+    max-width: 4em;
     display: inline;
   }
   .action-group {
@@ -279,5 +314,8 @@ export default {
   }
   input[type="number"] {
       -moz-appearance: textfield;
+  }
+  .spin-desc {
+    padding-left: 1em;
   }
 </style>

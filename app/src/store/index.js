@@ -40,6 +40,9 @@ export default new Vuex.Store({
     UPDATE_BPM(state, bpm) {
       state.bpm = bpm;
     },
+    RESET_BALLS(state) {
+      state.balls = initBalls();
+    },
     UPDATE_BALL(state, payload) {
       Vue.set(state.balls[payload.i], payload.prop, payload.value);
     },
