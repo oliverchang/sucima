@@ -60,11 +60,11 @@ export default {
       await device.gatt.connect();
       let service = await device.gatt.getPrimaryService(0xffe0);
       this.writeCharacteristic = await service.getCharacteristic(0xffe1);
-      this.$state.commit('UPDATE_CONNECTED', true);
+      this.$store.commit('UPDATE_CONNECTED', true);
     },
 
     onDisconnected() {
-      this.$state.commit('UPDATE_CONNECTED', false);
+      this.$store.commit('UPDATE_CONNECTED', false);
     },
 
     async writeBuffer(buffer) {
