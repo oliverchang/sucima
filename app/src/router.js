@@ -11,7 +11,7 @@ export default new Router({
       redirect: '/controller',
     },
     {
-      path: '/controller/:drill?',
+      path: '/controller',
       name: 'controller',
       component: Controller
     },

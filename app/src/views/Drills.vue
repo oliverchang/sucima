@@ -17,6 +17,7 @@
   </div>
 </template>
 <script>
+import Ball from '../ball.js'
 
 export default {
   name: 'drills',
@@ -27,13 +28,26 @@ export default {
   },
   methods: {
     load(key) {
-      this.$router.replace({
-        name: 'controller',
-        query: {
-          name: key,
-          drill: this.drills[key],
-        }
-      });
+      let data;
+      try {
+        data = Uint8Array.from(atob(this.drills[key]), c => c.charCodeAt(0));
+      } catch (e) {
+        console.log('Failed to decode.');
+        return;
+      }
+
+      this.$store.commit('UPDATE_BPM', data[0]);
+      this.$store.commit('UPDATE_BALL_COUNT', data[1]);
+      for (let i = 0; i < data[1]; i++) {
+        let index = 2  + i * Ball.encodedSize;
+        this.$store.commit('SET_BALL', {
+          i: i,
+          ball: Ball.decode(data.slice(index, index + Ball.encodedSize).buffer),
+        });
+      }
+
+      this.$store.commit('UPDATE_NAME', key);
+      this.$router.back();
     },
     del(key) {
       this.$delete(this.drills, key);

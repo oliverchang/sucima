@@ -223,6 +223,7 @@ export default {
     },
 
     reset() {
+      this.cur = 1;
       this.$store.commit('UPDATE_NAME', '');
       this.$store.commit('UPDATE_BPM', 0);
       this.$store.commit('UPDATE_BALL_COUNT', 1);

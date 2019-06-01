@@ -96,39 +96,9 @@ export default {
       drills[name] = btoa(String.fromCharCode(...data));
       localStorage.drills = JSON.stringify(drills);
     },
-
-    parseParams() {
-      if (!this.$route.query.drill)
-        return;
-
-      let data;
-      try {
-        data = Uint8Array.from(atob(this.$route.query.drill), c => c.charCodeAt(0));
-      } catch (e) {
-        console.log('Failed to decode.');
-        return;
-      }
-
-      this.$store.commit('UPDATE_BPM', data[0]);
-      this.$store.commit('UPDATE_BALL_COUNT', data[1]);
-      for (let i = 0; i < this.nballs; i++) {
-        let index = 2  + i * Ball.encodedSize;
-        this.$store.commit('SET_BALL', {
-          i: i,
-          ball: Ball.decode(data.slice(index, index + Ball.encodedSize).buffer),
-        });
-      }
-
-      this.$store.commit('UPDATE_NAME', this.$route.query.name);
-    },
   },
   components: {
     Controller
-  },
-  watch: {
-    '$route' () {
-      this.parseParams();
-    },
   },
   computed: {
     ...mapState([
