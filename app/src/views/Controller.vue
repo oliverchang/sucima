@@ -6,11 +6,11 @@
       </div>
       <div class="form-group col-12 col-md-6">
         <div class="btn-group float-right" role="group">
-        <div v-if="showInstall">
-          <button v-on:click="onClickInstall" id="install" type="button" class="form-control btn btn-primary">Install</button>
-        </div>
-          <b-button disabled>
-          v{{version}}
+          <b-button v-on:click="onClickInstall" id="install" type="button" class="form-control btn btn-primary" v-if="showInstall">
+            Install
+          </b-button>
+          <b-button type="button" class="btn btn-secondary" disabled>
+            v{{version}}
           </b-button>
 
           <b-button type="button" class="form-control btn btn-success connect-btn" disabled v-if="connected">
