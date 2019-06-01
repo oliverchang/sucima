@@ -4,23 +4,21 @@
       <div class="d-none d-md-block col-md-6">
         <h1>SUCIMA</h1>
       </div>
-      <div class="col-md-3">
+      <div class="form-group col-12 col-md-6">
+        <div class="btn-group float-right" role="group">
         <div v-if="showInstall">
           <button v-on:click="onClickInstall" id="install" type="button" class="form-control btn btn-primary">Install</button>
         </div>
-      </div>
-      <div class="form-group col-12 col-md-3">
-      <div class="btn-group float-right" role="group">
-        <b-button disabled>
-        v{{version}}
-        </b-button>
+          <b-button disabled>
+          v{{version}}
+          </b-button>
 
-        <b-button type="button" class="form-control btn btn-success connect-btn" disabled v-if="connected">
-          <i class="material-icons">bluetooth</i>
-        </b-button>
-        <b-button v-on:click="connectBluetooth" type="button" class="form-control btn btn-warning connect-btn" v-else>
-          <i class="material-icons">bluetooth</i>
-        </b-button>
+          <b-button type="button" class="form-control btn btn-success connect-btn" disabled v-if="connected">
+            <i class="material-icons">bluetooth</i>
+          </b-button>
+          <b-button v-on:click="connectBluetooth" type="button" class="form-control btn btn-warning connect-btn" v-else>
+            <i class="material-icons">bluetooth</i>
+          </b-button>
         </div>
       </div>
     </div>
