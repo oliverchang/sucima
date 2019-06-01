@@ -43,8 +43,6 @@ export default {
       this.deferredInstallPrompt = e;
       this.showInstall = true;
     });
-
-    this.parseParams();
   },
   methods: {
     async connectBluetooth() {
@@ -90,7 +88,7 @@ export default {
       data[0] = bpm;
       data[1] = nballs;
       for (let i = 0; i < nballs; i++) {
-        balls[i].encode(data.subarray(2 + i * Ball.encodedSize));
+        Ball.encode(balls[i], data.subarray(2 + i * Ball.encodedSize));
       }
 
       drills[name] = btoa(String.fromCharCode(...data));

@@ -182,7 +182,7 @@ export default {
       let array = new Int8Array(command.length + Ball.encodedSize);
 
       encodeString(command, array);
-      this.balls[this.cur - 1].encode(array.subarray(command.length))
+      Ball.encode(this.balls[this.cur - 1], array.subarray(command.length));
 
       await this.bleWrite(array.buffer);
     },
@@ -196,7 +196,7 @@ export default {
       array[command.length] = this.nballs;
 
       for (let i = 0; i < this.nballs; i++) {
-        this.balls[i].encode(array.subarray(command.length + 1 + Ball.encodedSize * i));
+        Ball.encode(this.balls[i], array.subarray(command.length + 1 + Ball.encodedSize * i));
       }
 
       await this.bleWrite(array.buffer);

@@ -34,12 +34,12 @@ class Ball {
     return 5;
   }
 
-  encode(result) {
-    result[0] = encodeSpinAngle(this.spin_angle);
-    result[1] = this.spin_strength;
-    result[2] = this.trajectory;
-    result[3] = this.position;
-    result[4] = this.speed;
+  static encode(ball, result) {
+    result[0] = encodeSpinAngle(ball.spin_angle);
+    result[1] = ball.spin_strength;
+    result[2] = ball.trajectory;
+    result[3] = ball.position;
+    result[4] = ball.speed;
 
     return result.buffer;
   }
