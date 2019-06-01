@@ -10,8 +10,18 @@
         </div>
       </div>
       <div class="form-group col-12 col-md-3">
-        <button type="button" class="form-control btn btn-success" disabled v-if="connected">Connected</button>
-        <button v-on:click="connectBluetooth" type="button" class="form-control btn btn-warning" v-else>Connect</button>
+      <div class="btn-group float-right" role="group">
+        <b-button disabled>
+        v{{version}}
+        </b-button>
+
+        <b-button type="button" class="form-control btn btn-success connect-btn" disabled v-if="connected">
+          <i class="material-icons">bluetooth</i>
+        </b-button>
+        <b-button v-on:click="connectBluetooth" type="button" class="form-control btn btn-warning connect-btn" v-else>
+          <i class="material-icons">bluetooth</i>
+        </b-button>
+        </div>
       </div>
     </div>
     <Controller
@@ -22,10 +32,17 @@
   </div>
 </template>
 
+<style scoped>
+.connect-btn {
+  width: 6em;
+}
+</style>
+
 <script>
 import { mapState } from 'vuex'
 
 import Ball from '../ball.js'
+import VERSION from '../version.js'
 import Controller from '../components/Controller.vue'
 
 export default {
@@ -102,7 +119,10 @@ export default {
     ...mapState([
       'connected',
       'nballs',
-    ])
+    ]),
+    version() {
+      return VERSION;
+    }
   },
 }
 </script>
