@@ -119,6 +119,10 @@
 import { mapState } from 'vuex'
 import Ball from '../ball.js'
 
+const SBPM_SIZE = 5;
+const SET_HEADER_SIZE = 4;
+const SMPL_HEADER_SIZE = 4;
+
 function encodeString(str, result) {
   for (let i = 0; i < str.length; i++) {
     result[i] = str.charCodeAt(i);
@@ -179,7 +183,7 @@ export default {
       if (!this.connected) return;
 
       let command = 'SMPL';
-      let array = new Int8Array(command.length + Ball.encodedSize);
+      let array = new Int8Array(SMPL_HEADER_SIZE + Ball.encodedSize);
 
       encodeString(command, array);
       Ball.encode(this.balls[this.cur - 1], array.subarray(command.length));
@@ -191,26 +195,33 @@ export default {
       if (!this.connected) return;
 
       let command = 'SET';
-      let array = new Int8Array(command.length + 1 + Ball.encodedSize * this.nballs);
+      let array = new Int8Array(
+          SET_HEADER_SIZE + Ball.encodedSize * this.nballs + SBPM_SIZE);
       encodeString(command, array);
       array[command.length] = this.nballs;
 
       for (let i = 0; i < this.nballs; i++) {
-        Ball.encode(this.balls[i], array.subarray(command.length + 1 + Ball.encodedSize * i));
+        Ball.encode(this.balls[i],
+                    array.subarray(SET_HEADER_SIZE + Ball.encodedSize * i));
       }
 
+      this.encodeSetBpm(
+          this.bpm,
+          array.subarray(SET_HEADER_SIZE + Ball.encodedSize * this.nballs));
+
       await this.bleWrite(array.buffer);
-      await this.setBpm(this.bpm);
+    },
+
+    encodeSetBpm(bpm, array) {
+      let command = 'SBPM';
+      encodeString(command, array);
+      array[command.length] = bpm;
     },
 
     async setBpm(bpm) {
       if (!this.connected) return;
-
-      let command = 'SBPM';
-      let array = new Int8Array(command.length + 1);
-      encodeString(command, array);
-
-      array[command.length] = bpm;
+      let array = new Int8Array(SBPM_SIZE);
+      this.encodeSetBpm(bpm, array);
       await this.bleWrite(array.buffer);
     },
 
