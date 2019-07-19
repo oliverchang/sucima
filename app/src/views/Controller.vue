@@ -81,7 +81,11 @@ export default {
     },
 
     async writeBuffer(buffer) {
-      await this.writeCharacteristic.writeValue(buffer);
+      const CHUNK_SIZE = 16;
+      for (let i = 0; i < buffer.byteLength; i += CHUNK_SIZE) {
+        await this.writeCharacteristic.writeValue(
+            buffer.slice(i, i+CHUNK_SIZE));
+      }
     },
 
     async onClickInstall() {
