@@ -31,6 +31,10 @@ void PrintBall(const Ball& ball) {
 
 }
 
+DrillController::DrillController() {
+  ResetDrillOrder();
+}
+
 void DrillController::SetDrillLength(size_t length) {
   if (length >= kMaxDrillLength)
     length = kMaxDrillLength;
@@ -49,12 +53,29 @@ void DrillController::SetDrill(size_t i, const Ball& ball) {
   PrintBall(ball);
 }
 
-void DrillController::Randomise() {
+void DrillController::SetRandom(bool random) {
+  random_ = random;
+  if (random) {
+    ShuffleDrill();
+  } else {
+    ResetDrillOrder();
+  }
+}
+
+void DrillController::ResetDrillOrder() {
+  for (size_t i = 0; i < kMaxDrillLength; ++i) {
+    indexes_[i] = i;
+  }
+}
+
+void DrillController::ShuffleDrill() {
+  ResetDrillOrder();
+
   for (size_t i = 0; i < drill_length_ - 1; ++i) {
     size_t new_i = random(i, drill_length_);
-    Ball tmp = drill_[i];
-    drill_[i] = drill_[new_i];
-    drill_[new_i] = tmp;
+    size_t tmp = indexes_[i];
+    indexes_[i] = indexes_[new_i];
+    indexes_[new_i] = tmp;
   }
 }
 
@@ -68,7 +89,7 @@ void DrillController::SetBallsPerMinute(int balls_per_min) {
     state_ = DRILL;
     cur_ = 0;
     next_ball_time_ = NextBallTime();
-    PrepareBall(drill_[cur_]);
+    PrepareBall(CurBall());
   } else {
     state_ = DRILL_STOPPING;
   }
@@ -112,7 +133,7 @@ void DrillController::Loop() {
     if (g_ball_feed_controller.BallWasFed()) {
       // Prepare the next ball.
       jam_count_ = 0;
-      PrepareBall(drill_[cur_]);
+      PrepareBall(CurBall());
     } else if (g_ball_feed_controller.IsJammed()) {
       HandleJam();
       return;
@@ -125,8 +146,12 @@ void DrillController::Loop() {
     next_ball_time_ = NextBallTime();
 
     ++cur_;
-    if (cur_ >= drill_length_)
+    if (cur_ >= drill_length_) {
+      if (random_) {
+        ShuffleDrill();
+      }
       cur_ = 0;
+    }
 
     break;
   case DRILL_STOPPING:
@@ -190,4 +215,8 @@ void DrillController::HandleJam() {
   g_ball_feed_controller.ReverseJam();
 
   next_ball_time_ = millis() + kJamReverseTime;
+}
+
+Ball& DrillController::CurBall() {
+  return drill_[indexes_[cur_]];
 }

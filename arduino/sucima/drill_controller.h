@@ -7,9 +7,10 @@
 
 class DrillController {
  public:
+  DrillController();
   void SetDrillLength(size_t length);
   void SetDrill(size_t i, const Ball& ball);
-  void Randomise();
+  void SetRandom(bool random);
   void SetBallsPerMinute(int balls_per_min);
   void SampleBall(const Ball& ball);
   void Loop();
@@ -30,13 +31,17 @@ class DrillController {
   void PrepareBall(const Ball& ball);
   unsigned long NextBallTime();
   void HandleJam();
+  void ShuffleDrill();
+  void ResetDrillOrder();
+  Ball& CurBall();
 
   Ball being_played_;
   Ball drill_[kMaxDrillLength];
+  size_t indexes_[kMaxDrillLength];
   size_t drill_length_ = 0;
+  bool random_ = false;
   size_t cur_ = 0;
   unsigned long next_ball_time_ = 0;
-  bool random_ = false;
   int balls_per_min_ = 0;
   State state_ = NONE;
   State pre_jam_state_ = NONE;

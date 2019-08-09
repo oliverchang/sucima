@@ -82,9 +82,7 @@ void HandleBallsPerMin(const char* payload, size_t size) {
   if (size < 2)
     return;
 
-  if (payload[0]) {
-    g_drill_controller.Randomise();
-  }
+  g_drill_controller.SetRandom(payload[0]);
   g_drill_controller.SetBallsPerMinute(payload[1]);
 }
 
