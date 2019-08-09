@@ -227,7 +227,7 @@ export default {
     async setBpm(bpm) {
       if (!this.connected) return;
       let array = new Int8Array(SBPM_SIZE);
-      this.encodeSetBpm(bpm, array);
+      this.encodeSetBpm(false, bpm, array);
       await this.bleWrite(array.buffer);
     },
 
