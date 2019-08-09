@@ -6,7 +6,7 @@
 namespace {
 
 constexpr int kMotorPwm = 180;
-constexpr int kSensorThreshold = 150;
+constexpr int kSensorThreshold = 80;
 constexpr int kMinimumMillis = 200;
 constexpr int kFeedDeadline = 1000;
 constexpr int kReverseTime = 500;
