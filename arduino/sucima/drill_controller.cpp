@@ -49,6 +49,15 @@ void DrillController::SetDrill(size_t i, const Ball& ball) {
   PrintBall(ball);
 }
 
+void DrillController::Randomise() {
+  for (size_t i = 0; i < drill_length_ - 1; ++i) {
+    size_t new_i = random(i, drill_length_);
+    Ball tmp = drill_[i];
+    drill_[i] = drill_[new_i];
+    drill_[new_i] = tmp;
+  }
+}
+
 void DrillController::SetBallsPerMinute(int balls_per_min) {
   DebugLog("Setting balls per min to ");
   DebugLog(balls_per_min);

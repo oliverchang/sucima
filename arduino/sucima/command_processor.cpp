@@ -31,7 +31,7 @@ bool CommandProcessor::HandleWaiting(Command* out) {
     expecting_ = sizeof(Ball);
     out->type = SMPL;
   } else if (memcmp(buf_, "SBPM", kCommandSize) == 0) {
-    expecting_ = 1;
+    expecting_ = 2;
     out->type = SBPM;
   } else {
     for (int i = 0; i < kCommandSize; i++) {

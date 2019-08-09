@@ -47,6 +47,10 @@
       <input class="val-2 form-control" type="number" v-model="cur">
       /
       <input class="val-2 form-control" type="number" v-model="nballs" readonly>
+
+      <b-button v-on:click="toggleRandom" v-bind:class="randomClass">
+        <i class="material-icons">shuffle</i>
+      </b-button>
     </div>
   </div>
   <div class="form-row">
@@ -82,7 +86,7 @@
         Position
         <input class="val form-control" type="number" v-model="position">
       </label>
-      <input class="form-control custom-range" v-model="position" id="position" type="range" min="-8" max="8">
+      <input class="form-control custom-range" v-model="position" id="position" type="range" min="-8" max="16">
     </div>
 
     <div class="form-group col-12 col-md-4">
@@ -119,7 +123,7 @@
 import { mapState } from 'vuex'
 import Ball from '../ball.js'
 
-const SBPM_SIZE = 5;
+const SBPM_SIZE = 6;
 const SET_HEADER_SIZE = 4;
 const SMPL_HEADER_SIZE = 4;
 
@@ -206,16 +210,18 @@ export default {
       }
 
       this.encodeSetBpm(
+          this.random,
           this.bpm,
           array.subarray(SET_HEADER_SIZE + Ball.encodedSize * this.nballs));
 
       await this.bleWrite(array.buffer);
     },
 
-    encodeSetBpm(bpm, array) {
+    encodeSetBpm(random, bpm, array) {
       let command = 'SBPM';
       encodeString(command, array);
-      array[command.length] = bpm;
+      array[command.length] = random;
+      array[command.length + 1] = bpm;
     },
 
     async setBpm(bpm) {
@@ -239,8 +245,13 @@ export default {
       this.$store.commit('UPDATE_BPM', 0);
       this.$store.commit('UPDATE_BALL_COUNT', 1);
       this.$store.commit('RESET_BALLS');
-    }
+    },
+
+    toggleRandom() {
+      this.$store.commit('UPDATE_RANDOM', !this.random);
+    },
   },
+
   computed: {
     saveDisabled() {
       return this.name.length == 0;
@@ -290,11 +301,18 @@ export default {
         this.$store.commit('UPDATE_NAME', value);
       },
     },
+    randomClass() {
+      if (this.random) {
+        return "btn btn-success float-right";
+      }
+      return "btn btn-secondary float-right";
+    },
     ...computedBallProperties(),
     ...mapState([
       'connected',
       'balls',
       'nballs',
+      'random',
     ])
   },
 }

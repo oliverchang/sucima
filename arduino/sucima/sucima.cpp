@@ -79,10 +79,13 @@ void HandleSample(const char* payload, size_t size) {
 }
 
 void HandleBallsPerMin(const char* payload, size_t size) {
-  if (size < 1)
+  if (size < 2)
     return;
 
-  g_drill_controller.SetBallsPerMinute(payload[0]);
+  if (payload[0]) {
+    g_drill_controller.Randomise();
+  }
+  g_drill_controller.SetBallsPerMinute(payload[1]);
 }
 
 void HandleCommand(const Command& cmd) {

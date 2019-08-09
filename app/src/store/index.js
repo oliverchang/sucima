@@ -6,7 +6,7 @@ import Ball from '../ball.js'
 
 Vue.use(Vuex);
 
-const kMaxBalls = 8;
+const kMaxBalls = 16;
 
 function initBalls() {
   let balls = new Array(kMaxBalls);
@@ -29,6 +29,7 @@ export default new Vuex.Store({
     balls: initBalls(),
     nballs: 1,
     bpm: 0,
+    random: false,
   },
   mutations: {
     UPDATE_CONNECTED(state, connected) {
@@ -54,7 +55,10 @@ export default new Vuex.Store({
     },
     UPDATE_BALL_COUNT(state, count) {
       state.nballs = count;
-    }
+    },
+    UPDATE_RANDOM(state, random) {
+      state.random = random;
+    },
   },
   plugins: [
     createPersistedState({
@@ -63,6 +67,7 @@ export default new Vuex.Store({
         'balls',
         'nballs',
         'bpm',
+        'random',
       ],
     }),
   ],

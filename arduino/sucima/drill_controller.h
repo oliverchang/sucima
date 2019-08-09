@@ -9,12 +9,13 @@ class DrillController {
  public:
   void SetDrillLength(size_t length);
   void SetDrill(size_t i, const Ball& ball);
+  void Randomise();
   void SetBallsPerMinute(int balls_per_min);
   void SampleBall(const Ball& ball);
   void Loop();
 
  private:
-  static constexpr int kMaxDrillLength = 10;
+  static constexpr int kMaxDrillLength = 16;
   static constexpr int kMaxJamCount = 4;
 
   enum State {
@@ -35,6 +36,7 @@ class DrillController {
   size_t drill_length_ = 0;
   size_t cur_ = 0;
   unsigned long next_ball_time_ = 0;
+  bool random_ = false;
   int balls_per_min_ = 0;
   State state_ = NONE;
   State pre_jam_state_ = NONE;
