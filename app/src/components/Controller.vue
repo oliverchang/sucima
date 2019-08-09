@@ -86,7 +86,7 @@
         Position
         <input class="val form-control" type="number" v-model="position">
       </label>
-      <input class="form-control custom-range" v-model="position" id="position" type="range" min="-8" max="16">
+      <input class="form-control custom-range" v-model="position" id="position" type="range" min="-8" max="8">
     </div>
 
     <div class="form-group col-12 col-md-4">
