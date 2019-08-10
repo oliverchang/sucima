@@ -44,9 +44,9 @@
     </div>
     <div class="form-group col-12 col-md-4">
       Ball
-      <input class="val-2 form-control" type="number" v-model="cur">
+      <span class="controller-val">{{cur}}</span>
       /
-      <input class="val-2 form-control" type="number" v-model="nballs" readonly>
+      <span class="controller-val">{{nballs}}</span>
 
       <b-button v-on:click="toggleRandom" v-bind:class="randomClass">
         <i class="material-icons">shuffle</i>
@@ -57,7 +57,7 @@
     <div class="form-group col-12 col-md-4">
       <label for="spin_strength">
         Spin strength
-        <input class="val form-control" type="number" v-model="spin_strength">
+        <span class="controller-val">{{spin_strength}}</span>
       </label>
       <input class="form-control custom-range" v-model="spin_strength" id="spin_strength" type="range" min="0" max="20">
     </div>
@@ -65,7 +65,7 @@
     <div class="form-group col-12 col-md-4">
       <label for="spin_angle">
         Spin angle
-        <input v-bind:disabled="spinDisabled" class="val form-control" type="number" v-model="spin_angle">
+        <span class="controller-val">{{spin_angle}}</span>
         <small class="spin-desc">{{spinDesc}}</small>
       </label>
       <input v-bind:disabled="spinDisabled" class="form-control custom-range" v-model="spin_angle" id="spin" type="range" min="-180" max="180" step="2">
@@ -74,7 +74,7 @@
     <div class="form-group col-12 col-md-4">
       <label for="speed">
         Speed
-        <input class="val form-control" type="number" v-model="speed">
+        <span class="controller-val">{{speed}}</span>
       </label>
       <input class="form-control custom-range" v-model="speed" id="speed" type="range" min="1" max="20">
     </div>
@@ -84,7 +84,7 @@
     <div class="form-group col-12 col-md-4">
       <label for="position">
         Position
-        <input class="val form-control" type="number" v-model="position">
+        <span class="controller-val">{{position}}</span>
       </label>
       <input class="form-control custom-range" v-model="position" id="position" type="range" min="-8" max="8">
     </div>
@@ -92,7 +92,7 @@
     <div class="form-group col-12 col-md-4">
       <label for="trajectory">
         Trajectory
-        <input class="val form-control" type="number" v-model="trajectory">
+        <span class="controller-val">{{trajectory}}</span>
       </label>
       <input class="form-control custom-range" v-model="trajectory" id="trajectory" type="range" min="0" max="16">
     </div>
@@ -104,7 +104,7 @@
     <div class="form-group col-12 col-md-4">
       <label for="bpm">
         Balls/min
-      <input class="val form-control" type="number" v-model="bpm">
+        <span class="controller-val">{{bpm}}</span>
       </label>
       <input class="form-control custom-range" v-model="bpm" id="bpm" type="range" min="0" max="100" value="0">
     </div>
@@ -356,5 +356,11 @@ export default {
   }
   .material-icons {
     font-size: 18px;
+  }
+  .controller-val {
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 1em;
+    padding-right: 1em;
   }
 </style>
