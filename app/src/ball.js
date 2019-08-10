@@ -20,6 +20,13 @@ class Ball {
     this.speed = speed;
   }
 
+  copy() {
+    return new Ball(
+      this.spin_angle, this.spin_strength, this.trajectory, this.position,
+      this.speed,
+    );
+  }
+
   static decode(buffer) {
     let view = new DataView(buffer);
     return new Ball(

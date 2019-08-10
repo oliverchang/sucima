@@ -177,6 +177,12 @@ export default {
   methods: {
     changeBallCount(delta) {
       this.$store.commit('CHANGE_BALL_COUNT', delta);
+      if (delta == 1) {
+        this.$store.commit('SET_BALL', {
+          i: this.nballs - 1,
+          ball: this.balls[this.cur - 1].copy(),
+        });
+      }
       if (this.cur > this.nballs)
         this.cur = this.nballs;
     },
@@ -280,7 +286,7 @@ export default {
       } else if (this.spin_angle > 0 && this.spin_angle < 90) {
         return 'Top right';
       } else if (this.spin_angle > 90 && this.spin_angle < 180) {
-        return 'Bottom left';
+        return 'Bottom right';
       }
 
       return '';
